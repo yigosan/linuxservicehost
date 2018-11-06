@@ -1,0 +1,99 @@
+﻿
+	get package-manager instructions from : https://www.microsoft.com/net/download/dotnet-core/2.1
+	install package manager as instructed for linux.
+
+	#NOT SURE libraries below are actually necessary
+    apt-get install -y libunwind-dev  
+    apt-get install libunwind8 icu-devtools  
+     
+	reboot
+
+	# TRY following command to see if installed correctly.
+    /bin/dotnet/dotnet --version  
+          
+After these commands executed you should get 2.1.300 as an output message meaning that .NET Core 2.1 SDK is successfully installed and you can now run .NET Core 2.1 applications on this machine.
+
+Next step is setting up support for our service and an account under which service will run.
+view plainprint?
+
+    apt-get install -y systemd  
+	sudo useradd -s /sbin/nologin dotnetuser
+    # useradd -m dotnetuser -p dotnetpass  
+
+	apt-get install unzip          
+
+Now we can publish our application from Visual Studio to http://update.paket.com/[MYSERVICE].zip
+view plainprint?
+
+
+    cd $HOME  
+    cp ./[MYSERVICE] -r /etc/[MYSERVICE]
+	sudo chown -R dotnetuser:dotnetuser /etc/[MYSERVICE]
+	# NOT SURE IF BELOW IS NECESSARY
+    # chmod +x /etc/Core.Service.Sample  
+          
+
+We need to configure our service for systemd. Navigate to first to systemd configurations folder
+view plainprint?
+
+    cd /etc/systemd/system  
+          
+
+Start nano, paste the following code and save as [MYSERVICE].service
+view plainprint?
+
+    [Unit]  
+    Description=dotnetcore 2.1 sample service with generic host  
+      
+    [Service]  
+    ExecStart=/usr/bin/dotnet [MYSERVICE].dll  
+    WorkingDirectory=/etc/[MYSERVICE]/  
+    User=dotnetuser  
+    Group=dotnetuser  
+    Restart=on-failure  
+    SyslogIdentifier=[MYSERVICE]  
+    PrivateTemp=true  
+      
+    [Install]  
+    WantedBy=multi-user.target  
+          
+
+We are ready to register our service now and start it
+view plainprint?
+
+    systemctl daemon-reload  
+    systemctl enable dotnetcore-sample-generichost.service  
+    systemctl start dotnetcore-sample-generichost.service  
+    systemctl status dotnetcore-sample-generichost.service  
+          
+
+We should get the following message confirming that our service is running properly
+
+..... 
+
+Let's stop the service and check our logs to see if all events are handled property, same as on our development machine from Visual Studio
+view plainprint?
+
+    systemctl stop dotnetcore-sample-generichost.service  
+          
+
+Note
+
+You might have to manually create Logs folder in /etc/Core.Sample.Service and set write permission to it with chmod 777
+
+Our log file should have all events captured and loged as following file I took from my Linux VM where I run a test
+2018-06-15 21:02:41.656 +04:00 [Debug] Hosting starting
+2018-06-15 21:02:41.690 +04:00 [Information] StartAsync method called.
+2018-06-15 21:02:41.702 +04:00 [Information] OnStarted method called.
+2018-06-15 21:02:41.705 +04:00 [Debug] Hosting started
+2018-06-15 21:03:17.516 +04:00 [Information] OnStopping method called.
+2018-06-15 21:03:17.517 +04:00 [Debug] Hosting stopping
+2018-06-15 21:03:17.518 +04:00 [Information] StopAsync method called.
+2018-06-15 21:03:17.518 +04:00 [Information] OnStopped method called.
+2018-06-15 21:03:17.519 +04:00 [Debug] Hosting stopped
+
+Finally we write Windows like services on Linux host and handle stop and start with .NET Core 2.1. This is really important if we need to explicitly close connection on service stop and perform a clean stop.
+
+TROUBLESHHOTING
+
+journalctl -u [MYSERVICE]
