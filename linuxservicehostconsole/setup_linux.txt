@@ -1,4 +1,9 @@
 ﻿
+	DONT FORGET TO INCLUDE ALL DLLs on package deployment by modificying .csproj file by adding CopyLocalLockFileAssemblies node under propertygroup. 
+	<PropertyGroup>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	</PropertyGroup>
+
 	get package-manager instructions from : https://www.microsoft.com/net/download/dotnet-core/2.1
 	install package manager as instructed for linux.
 
@@ -23,10 +28,11 @@ view plainprint?
 	apt-get install unzip          
 
 Now we can publish our application from Visual Studio to http://update.paket.com/[MYSERVICE].zip
-view plainprint?
 
 
     cd $HOME  
+	wget http://update.paket.com/[MYSERVICE].zip
+	unzip [MYSERVICE].zip -d [MYSERVICE]
     cp ./[MYSERVICE] -r /etc/[MYSERVICE]
 	sudo chown -R dotnetuser:dotnetuser /etc/[MYSERVICE]
 	# NOT SURE IF BELOW IS NECESSARY
