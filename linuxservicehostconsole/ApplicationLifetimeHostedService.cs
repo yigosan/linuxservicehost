@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,6 +14,7 @@ namespace linuxservicehostconsole
         ILogger<ApplicationLifetimeHostedService> logger;
         IHostingEnvironment environment;
         IConfiguration configuration;
+
         public ApplicationLifetimeHostedService(
             IConfiguration configuration,
             IHostingEnvironment environment,
@@ -40,6 +42,20 @@ namespace linuxservicehostconsole
         private void OnStarted()
         {
             this.logger.LogInformation("OnStarted method called.");
+            CryptoTest crypto = new CryptoTest();
+
+            string text = "yigit";
+            
+
+            String encrypted = crypto.Encrypt(text);
+            string base64orig = Convert.ToBase64String(Encoding.UTF8.GetBytes(encrypted));
+            this.logger.LogInformation("encrypted -> " + base64orig);
+
+            byte[] data = Convert.FromBase64String(base64orig);
+            String base64decrypt = Encoding.UTF8.GetString(data, 0, data.Length);
+            String decrypted = crypto.Decrypt(base64decrypt);
+            this.logger.LogInformation("decrypted -> " + decrypted);
+
 
             // Post-startup code goes here  
         }

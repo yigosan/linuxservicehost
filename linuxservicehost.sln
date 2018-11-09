@@ -3,9 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2026
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "linuxservicehost", "linuxservicehost\linuxservicehost.csproj", "{13F2FE4E-2474-4248-B760-1C0575172350}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "linuxservicehostconsole", "linuxservicehostconsole\linuxservicehostconsole.csproj", "{10150E92-A328-436B-ADF3-C99CDED2AA0B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "linuxservicehostconsole", "linuxservicehostconsole\linuxservicehostconsole.csproj", "{10150E92-A328-436B-ADF3-C99CDED2AA0B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,10 +11,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{13F2FE4E-2474-4248-B760-1C0575172350}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{13F2FE4E-2474-4248-B760-1C0575172350}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{13F2FE4E-2474-4248-B760-1C0575172350}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{13F2FE4E-2474-4248-B760-1C0575172350}.Release|Any CPU.Build.0 = Release|Any CPU
 		{10150E92-A328-436B-ADF3-C99CDED2AA0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{10150E92-A328-436B-ADF3-C99CDED2AA0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{10150E92-A328-436B-ADF3-C99CDED2AA0B}.Release|Any CPU.ActiveCfg = Release|Any CPU

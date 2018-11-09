@@ -4,12 +4,12 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using System.IO;
-using System.Threading.Tasks;
 
 namespace linuxservicehostconsole
 {
     public class Program
     {
+        
         public static void Main(string[] args)
         {
             IHost host = new HostBuilder()
@@ -44,5 +44,7 @@ namespace linuxservicehostconsole
 
             host.Run();
         }
+
+
     }
 }
