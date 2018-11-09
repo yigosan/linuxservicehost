@@ -13,8 +13,8 @@ namespace linuxservicehostconsole
 {
     class CryptoTest
     {
-        public static byte[] _key = null;
-        public static byte[] _iv = null;
+        public static KeyParameter _key = null;
+        public static ParametersWithIV _keyWithIV = null;
         private static int _ivlength = 16;
         SecureRandom random = new SecureRandom();
 
@@ -25,9 +25,12 @@ namespace linuxservicehostconsole
 
         private void generateEncryptionKeys()
         {
-            _key = new byte[32]; // 256 bits
-            random.NextBytes(_key);
-            _iv = generateIV(16);
+            byte[] keyBytes = new byte[32]; // 256 bits
+            random.NextBytes(keyBytes);
+            _key = new KeyParameter(keyBytes);
+
+            byte[] ivBytes = generateIV(_ivlength);
+            _keyWithIV = new ParametersWithIV(_key, ivBytes, 0, _ivlength);
         }
 
         private static byte[] generateIV(int ivLength)
@@ -40,18 +43,21 @@ namespace linuxservicehostconsole
             }
         }
 
-        public string Encrypt(string plainText)
+        private static PaddedBufferedBlockCipher getChipher()
         {
-
             AesEngine engine = new AesEngine();
             CbcBlockCipher blockCipher = new CbcBlockCipher(engine); //CBC
             PaddedBufferedBlockCipher cipher = new PaddedBufferedBlockCipher(blockCipher, new Pkcs7Padding()); //Default scheme is PKCS5/PKCS7
-            KeyParameter keyParam = new KeyParameter(_key);
-            ParametersWithIV keyParamWithIV = new ParametersWithIV(keyParam, _iv, 0, _ivlength);
+            return cipher;
+        }
+
+        public string Encrypt(string plainText)
+        {
+            PaddedBufferedBlockCipher cipher = getChipher();
 
             byte[] inputBytes = Encoding.UTF8.GetBytes(plainText);
             // Encrypt
-            cipher.Init(true, keyParamWithIV);
+            cipher.Init(true, _keyWithIV);
             byte[] outputBytes = new byte[cipher.GetOutputSize(inputBytes.Length)];
             int length = cipher.ProcessBytes(inputBytes, outputBytes, 0);
             cipher.DoFinal(outputBytes, length); //Do the final block
@@ -62,14 +68,10 @@ namespace linuxservicehostconsole
 
         public string Decrypt(string base64encryptedText)
         {
-            AesEngine engine = new AesEngine();
-            CbcBlockCipher blockCipher = new CbcBlockCipher(engine); //CBC
-            PaddedBufferedBlockCipher cipher = new PaddedBufferedBlockCipher(blockCipher, new Pkcs7Padding()); //Default scheme is PKCS5/PKCS7
-            KeyParameter keyParam = new KeyParameter(_key);
-            ParametersWithIV keyParamWithIV = new ParametersWithIV(keyParam, _iv, 0, _ivlength);
+            PaddedBufferedBlockCipher cipher = getChipher();
 
             byte[] encryptedBytes = Convert.FromBase64String(base64encryptedText);
-            cipher.Init(false, keyParamWithIV);
+            cipher.Init(false, _keyWithIV);
             byte[] resultingBytes = new byte[cipher.GetOutputSize(encryptedBytes.Length)];
             int length = cipher.ProcessBytes(encryptedBytes, 0, encryptedBytes.Length, resultingBytes, 0);
             cipher.DoFinal(resultingBytes, length); //Do the final block
