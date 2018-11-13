@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -56,6 +58,12 @@ namespace linuxservicehostconsole
             String decrypted = crypto.Decrypt(base64decrypt);
             this.logger.LogInformation("decrypted -> " + decrypted);
 
+            String detectedLiveIpV4 = GetLiveIpAddressV4().ToString();
+            String detectedLiveIpV6 = GetLiveIpAddressV6().ToString();
+
+
+            this.logger.LogInformation("Live IPv4 -> " + detectedLiveIpV4);
+            this.logger.LogInformation("Live IPv6 -> " + detectedLiveIpV6);
 
             // Post-startup code goes here  
         }
@@ -81,5 +89,40 @@ namespace linuxservicehostconsole
 
             return Task.CompletedTask;
         }
+
+        public static IPAddress GetLiveIpAddressV4()
+        {
+            // Just make a call to a dummy address. Address need not be existing.
+            IPAddress localIP = null;
+            using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, 0))
+            {
+                try
+                {
+                    socket.Connect("10.0.4.4", 65530);
+                    IPEndPoint endPoint = socket.LocalEndPoint as IPEndPoint;
+                    localIP = endPoint.Address;
+                }
+                catch (Exception) { }
+            }
+            return localIP;
+        }
+
+        public static IPAddress GetLiveIpAddressV6()
+        {
+            // Just make a call to a dummy address. Address need not be existing.
+            IPAddress localIP = null;
+            using (Socket socket = new Socket(AddressFamily.InterNetworkV6, SocketType.Dgram, 0))
+            {
+                try
+                {
+                    socket.Connect("dddd:dddd:140:11e1:ffff:ffff::1", 65530); // dummy ip address
+                    IPEndPoint endPoint = socket.LocalEndPoint as IPEndPoint;
+                    localIP = endPoint.Address;
+                }
+                catch (Exception) { }
+            }
+            return localIP;
+        }
+
     }
 }
